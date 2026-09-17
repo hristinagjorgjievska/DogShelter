@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Shelters', ~{::section})}">
+<body>
+<section>
+    <div class="page-header">
+        <div>
+            <h1>Shelters</h1>
+            <p class="subtitle">Partner shelters and how many dogs each one currently houses.</p>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>City</th>
+                <th>Address</th>
+                <th>Phone</th>
+                <th>Dogs / capacity</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="s : ${shelters}">
+                <td><strong th:text="${s.name}">Shelter</strong></td>
+                <td th:text="${s.city}">Skopje</td>
+                <td th:text="${s.address}">Address</td>
+                <td th:text="${s.phone}">Phone</td>
+                <td th:text="|${dogCounts[s.id]} / ${s.capacity}|">0 / 0</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(shelters)}">
+                <td colspan="5" class="empty">No shelters registered.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

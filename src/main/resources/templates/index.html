@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Dashboard', ~{::section})}">
+<body>
+<section>
+    <div class="page-header">
+        <div>
+            <h1>Dashboard</h1>
+            <p class="subtitle">Overview of dogs in care, adoptions and pending requests!</p>
+        </div>
+        <a class="btn" th:href="@{/requests/new}">New adoption request</a>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="dashboard-stat">
+            <div class="label">Dogs in care</div>
+            <div class="value" th:text="${totalDogs}">0</div>
+        </div>
+        <div class="dashboard-stat">
+            <div class="label">Available</div>
+            <div class="value" th:text="${availableDogs}">0</div>
+        </div>
+        <div class="dashboard-stat">
+            <div class="label">Adopted</div>
+            <div class="value" th:text="${adoptedDogs}">0</div>
+        </div>
+        <div class="dashboard-stat">
+            <div class="label">Pending requests</div>
+            <div class="value" th:text="${pendingRequests}">0</div>
+        </div>
+    </div>
+
+    <div class="spotlight" th:if="${not #lists.isEmpty(availableList)}" th:with="spotlight=${availableList[0]}">
+        <div class="spotlight-avatar" th:text="${#strings.substring(spotlight.name,0,1)}">L</div>
+        <div class="spotlight-body">
+            <div class="spotlight-kicker">Looking for a home</div>
+            <div class="spotlight-name" th:text="${spotlight.name}">Luna</div>
+            <div class="spotlight-meta"
+                 th:text="|${spotlight.breed.displayName} · ${spotlight.sex.displayName} · ${spotlight.ageLabel} · ${spotlight.shelter.name}|">
+                Beagle · Female · 2 years · Shelter
+            </div>
+        </div>
+        <a class="btn" th:href="@{/requests/new(dogId=${spotlight.id})}">Request adoption</a>
+    </div>
+
+    <h2>Available for adoption</h2>
+    <div class="dog-cards" th:if="${not #lists.isEmpty(availableList)}">
+        <div class="dog-card" th:each="dog : ${availableList}">
+            <div class="dog-card-top">
+                <div class="dog-card-avatar" th:text="${#strings.substring(dog.name,0,1)}">R</div>
+                <div>
+                    <div class="dog-card-name" th:text="${dog.name}">Rex</div>
+                    <div class="dog-card-meta" th:text="${dog.breed.displayName}">Beagle</div>
+                </div>
+            </div>
+            <div class="dog-card-meta" th:text="|${dog.sex.displayName} · ${dog.ageLabel} · ${dog.shelter.name}|">
+                Male · 2 years · Shelter
+            </div>
+            <a class="btn btn-sm" th:href="@{/requests/new(dogId=${dog.id})}">Request adoption</a>
+        </div>
+    </div>
+    <div class="empty" th:if="${#lists.isEmpty(availableList)}">No dogs are currently available for adoption.</div>
+
+    <h2>Recent requests</h2>
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Dog</th>
+                <th>Adopter</th>
+                <th>Submitted</th>
+                <th>Status</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${recentRequests}">
+                <td><strong th:text="${r.dog.name}">Luna</strong></td>
+                <td th:text="${r.adopter.fullName}">Ana</td>
+                <td class="small" th:text="${#temporals.format(r.submittedAt, 'dd MMM yyyy, HH:mm')}">date</td>
+                <td>
+                    <span class="badge" th:classappend="|badge-${#strings.toLowerCase(r.status.name())}|"
+                          th:text="${r.status.displayName}">Pending</span>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(recentRequests)}">
+                <td colspan="4" class="empty">No adoption requests yet.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

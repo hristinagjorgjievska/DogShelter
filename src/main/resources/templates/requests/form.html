@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout(${requestId == null} ? 'New request' : 'Edit request', ~{::section})}">
+<body>
+<section>
+    <div class="page-header">
+        <div>
+            <h1 th:text="${requestId == null} ? 'New adoption request' : 'Edit adoption request'">New adoption request</h1>
+            <p class="subtitle">Only dogs that are currently available can be requested.</p>
+        </div>
+    </div>
+
+    <form class="card form" th:object="${form}" method="post"
+          th:action="${requestId == null} ? @{/requests} : @{/requests/{id}(id=${requestId})}">
+
+        <div class="field" th:classappend="${#fields.hasErrors('dogId')} ? 'has-error'">
+            <label for="dogId">Dog</label>
+            <select id="dogId" th:field="*{dogId}">
+                <option value="">Select a dog</option>
+                <option th:each="d : ${dogs}" th:value="${d.id}"
+                        th:text="|${d.name} — ${d.breed.displayName}, ${d.ageLabel} (${d.shelter.name})|">Luna</option>
+            </select>
+            <div class="error" th:if="${#fields.hasErrors('dogId')}" th:errors="*{dogId}"></div>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('adopterId')} ? 'has-error'">
+            <label for="adopterId">Adopter</label>
+            <select id="adopterId" th:field="*{adopterId}">
+                <option value="">Select an adopter</option>
+                <option th:each="a : ${adopters}" th:value="${a.id}"
+                        th:text="|${a.fullName} (${a.email})|">Ana</option>
+            </select>
+            <div class="error" th:if="${#fields.hasErrors('adopterId')}" th:errors="*{adopterId}"></div>
+        </div>
+
+        <div class="field" th:classappend="${#fields.hasErrors('message')} ? 'has-error'">
+            <label for="message">Message</label>
+            <textarea id="message" th:field="*{message}"
+                      placeholder="Why would this adopter be a good match for the dog?"></textarea>
+            <div class="error" th:if="${#fields.hasErrors('message')}" th:errors="*{message}"></div>
+        </div>
+
+        <div class="form-actions">
+            <button class="btn" type="submit"
+                    th:text="${requestId == null} ? 'Submit request' : 'Save changes'">Submit request</button>
+            <a class="btn btn-secondary" th:href="@{/requests}">Cancel</a>
+        </div>
+    </form>
+</section>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Dogs', ~{::section})}">
+<body>
+<section>
+    <div class="page-header">
+        <div>
+            <h1>Dogs</h1>
+            <p class="subtitle" th:text="|${#lists.size(dogs)} dogs listed|">12 dogs listed</p>
+        </div>
+        <a class="btn" th:href="@{/dogs/new}">Add dog</a>
+    </div>
+
+    <div class="dashboard-stats">
+        <div class="dashboard-stat">
+            <div class="label">Total dogs</div>
+            <div class="value" th:text="${totalCount}">0</div>
+        </div>
+        <div class="dashboard-stat">
+            <div class="label">Available</div>
+            <div class="value" th:text="${availableCount}">0</div>
+        </div>
+        <div class="dashboard-stat">
+            <div class="label">Under care</div>
+            <div class="value" th:text="${underCareCount}">0</div>
+        </div>
+        <div class="dashboard-stat">
+            <div class="label">Adopted</div>
+            <div class="value" th:text="${adoptedCount}">0</div>
+        </div>
+    </div>
+
+    <form class="filters" method="get" th:action="@{/dogs}">
+        <div class="field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="">All statuses</option>
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}"
+                        th:selected="${s == selectedStatus}">Available</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="breed">Breed</label>
+            <select id="breed" name="breed">
+                <option value="">All breeds</option>
+                <option th:each="b : ${breeds}" th:value="${b}" th:text="${b.displayName}"
+                        th:selected="${b == selectedBreed}">Beagle</option>
+            </select>
+        </div>
+        <button class="btn btn-secondary" type="submit">Filter</button>
+        <a class="btn btn-secondary" th:href="@{/dogs}"
+           th:if="${selectedStatus != null or selectedBreed != null}">Clear</a>
+    </form>
+
+    <div class="dog-cards" th:if="${not #lists.isEmpty(dogs)}">
+        <div class="dog-card" th:each="dog : ${dogs}">
+            <div class="dog-card-top">
+                <div class="dog-card-avatar" th:text="${#strings.substring(dog.name,0,1)}">R</div>
+                <div>
+                    <div class="dog-card-name" th:text="${dog.name}">Rex</div>
+                    <div class="dog-card-meta" th:text="${dog.breed.displayName}">Beagle</div>
+                </div>
+                <span class="badge" th:classappend="|badge-${#strings.toLowerCase(dog.status.name())}|"
+                      th:text="${dog.status.displayName}">Available</span>
+            </div>
+            <div class="dog-card-meta"
+                 th:text="${dog.sex.displayName + ' · ' + dog.ageLabel + (dog.weightKg != null ? ' · ' + dog.weightKg + ' kg' : '')}">
+                Male · 2 years · 12 kg
+            </div>
+            <div class="small muted" th:text="${dog.description}">Description</div>
+            <div class="small muted" th:text="${dog.shelter.name}">Shelter</div>
+            <div class="dog-card-actions">
+                <a class="btn btn-sm" th:if="${dog.status.name() == 'AVAILABLE'}"
+                   th:href="@{/requests/new(dogId=${dog.id})}">Request</a>
+                <a class="btn btn-sm btn-secondary" th:href="@{/dogs/{id}/edit(id=${dog.id})}">Edit</a>
+                <form th:action="@{/dogs/{id}/delete(id=${dog.id})}" method="post"
+                      th:data-name="${dog.name}"
+                      onsubmit="return confirm('Remove ' + this.dataset.name + ' from the shelter?')">
+                    <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="empty" th:if="${#lists.isEmpty(dogs)}">No dogs match these filters.</div>
+</section>
+</body>
+</html>

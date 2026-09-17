@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" th:fragment="layout(title, content)">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${title} + ' · Dog Shelter'">Dog Shelter</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<header class="topbar">
+    <div class="topbar-inner">
+        <a class="brand" th:href="@{/}">
+            <svg class="brand-icon" width="26" height="26" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <circle cx="5.5" cy="9" r="2.1"/>
+                <circle cx="9.5" cy="5.2" r="2.1"/>
+                <circle cx="14.5" cy="5.2" r="2.1"/>
+                <circle cx="18.5" cy="9" r="2.1"/>
+                <path d="M12 11c-3.3 0-7 2.2-7 5.4 0 1.9 1.6 3.1 3.5 2.6.9-.2 1.7-.7 2.4-.9.7-.2 1.5-.2 2.2 0 .7.2 1.5.7 2.4.9 1.9.5 3.5-.7 3.5-2.6 0-3.2-3.7-5.4-7-5.4z"/>
+            </svg>
+            Dog Shelter
+        </a>
+        <nav class="nav">
+            <a th:href="@{/dogs}" th:classappend="${#strings.startsWith(currentPath, '/dogs')} ? 'active'">Dogs</a>
+            <a th:href="@{/requests}" th:classappend="${#strings.startsWith(currentPath, '/requests')} ? 'active'">Requests</a>
+            <a th:href="@{/shelters}" th:classappend="${#strings.startsWith(currentPath, '/shelters')} ? 'active'">Shelters</a>
+            <a th:href="@{/adopters}" th:classappend="${#strings.startsWith(currentPath, '/adopters')} ? 'active'">Adopters</a>
+        </nav>
+    </div>
+</header>
+<main class="container">
+    <div th:if="${success}" class="alert alert-success" th:text="${success}"></div>
+    <div th:if="${error}" class="alert alert-error" th:text="${error}"></div>
+    <th:block th:replace="${content}"></th:block>
+</main>
+</body>
+</html>

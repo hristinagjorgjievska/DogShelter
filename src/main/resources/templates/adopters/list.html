@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Adopters', ~{::section})}">
+<body>
+<section>
+    <div class="page-header">
+        <div>
+            <h1>Adopters</h1>
+            <p class="subtitle">People registered to adopt a dog.</p>
+        </div>
+    </div>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>City</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="a : ${adopters}">
+                <td><strong th:text="${a.fullName}">Ana Petrovska</strong></td>
+                <td th:text="${a.email}">email</td>
+                <td th:text="${a.phone}">phone</td>
+                <td th:text="${a.city}">Skopje</td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(adopters)}">
+                <td colspan="4" class="empty">No adopters registered.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>

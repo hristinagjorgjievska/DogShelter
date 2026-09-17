@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{fragments/layout :: layout('Adoption requests', ~{::section})}">
+<body>
+<section>
+    <div class="page-header">
+        <div>
+            <h1>Adoption requests</h1>
+            <p class="subtitle">Approving a request adopts the dog and closes its other pending requests.</p>
+        </div>
+        <a class="btn" th:href="@{/requests/new}">New request</a>
+    </div>
+
+    <form class="filters" method="get" th:action="@{/requests}">
+        <div class="field">
+            <label for="status">Status</label>
+            <select id="status" name="status">
+                <option value="">All statuses</option>
+                <option th:each="s : ${statuses}" th:value="${s}" th:text="${s.displayName}"
+                        th:selected="${s == selectedStatus}">Pending</option>
+            </select>
+        </div>
+        <button class="btn btn-secondary" type="submit">Filter</button>
+        <a class="btn btn-secondary" th:href="@{/requests}" th:if="${selectedStatus != null}">Clear</a>
+    </form>
+
+    <div class="table-wrap">
+        <table>
+            <thead>
+            <tr>
+                <th>Dog</th>
+                <th>Adopter</th>
+                <th>Submitted</th>
+                <th>Status</th>
+                <th>Decided</th>
+                <th>Message</th>
+                <th></th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="r : ${requests}">
+                <td>
+                    <strong th:text="${r.dog.name}">Luna</strong>
+                    <div class="small muted" th:text="${r.dog.breed.displayName}">Labrador</div>
+                </td>
+                <td>
+                    <span th:text="${r.adopter.fullName}">Ana</span>
+                    <div class="small muted" th:text="${r.adopter.city}">Skopje</div>
+                </td>
+                <td class="small" th:text="${#temporals.format(r.submittedAt, 'dd MMM yyyy, HH:mm')}">date</td>
+                <td>
+                    <span class="badge" th:classappend="|badge-${#strings.toLowerCase(r.status.name())}|"
+                          th:text="${r.status.displayName}">Pending</span>
+                </td>
+                <td class="small"
+                    th:text="${r.decidedAt != null} ? ${#temporals.format(r.decidedAt, 'dd MMM yyyy, HH:mm')} : '—'">—</td>
+                <td class="small muted" th:text="${r.message}">Message</td>
+                <td class="actions">
+                    <th:block th:if="${r.status.name() == 'PENDING'}">
+                        <form th:action="@{/requests/{id}/approve(id=${r.id})}" method="post">
+                            <button class="btn btn-sm btn-success" type="submit">Approve</button>
+                        </form>
+                        <form th:action="@{/requests/{id}/reject(id=${r.id})}" method="post">
+                            <button class="btn btn-sm btn-secondary" type="submit">Reject</button>
+                        </form>
+                        <a class="btn btn-sm btn-secondary" th:href="@{/requests/{id}/edit(id=${r.id})}">Edit</a>
+                    </th:block>
+                    <form th:action="@{/requests/{id}/delete(id=${r.id})}" method="post"
+                          onsubmit="return confirm('Delete this adoption request?')">
+                        <button class="btn btn-sm btn-danger" type="submit">Delete</button>
+                    </form>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(requests)}">
+                <td colspan="7" class="empty">No adoption requests found.</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</section>
+</body>
+</html>
