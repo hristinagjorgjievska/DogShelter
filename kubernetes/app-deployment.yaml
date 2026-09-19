@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-deployment
+  namespace: dogshelter
+spec:
+  replicas: 4
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: dogshelter-app
+  template:
+    metadata:
+      labels:
+        app: dogshelter-app
+    spec:
+      containers:
+        - name: app
+          image: hristinagjorgjievska/dog-shelter:latest
+          ports:
+            - containerPort: 8080
+          envFrom:
+            - configMapRef:
+                name: dogshelter-config-map
+            - secretRef:
+                name: dogshelter-secret
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://$(DB_HOST):$(DB_PORT)/$(DB_NAME)
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: dogshelter-secret
+                  key: username
+
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: dogshelter-secret
+                  key: password
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 20
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+            initialDelaySeconds: 30
+            periodSeconds: 15
